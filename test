@@ -1,0 +1,89 @@
+
+
+!pip install web3
+
+----
+
+from web3 import Web3
+
+RPC_URL = "https://sepolia.infura.io/v3/YOUR_PROJECT_ID"   # or Alchemy etc
+PRIVATE_KEY = "0xYOUR_PRIVATE_KEY"                         # your Sepolia-only burner
+CONTRACT_ADDRESS = "0xYOUR_COUNTERV2_ADDRESS"
+
+w3 = Web3(Web3.HTTPProvider(RPC_URL))
+print("Connected:", w3.is_connected())
+
+acct = w3.eth.account.from_key(PRIVATE_KEY)
+MY_ADDRESS = acct.address
+print("Your address:", MY_ADDRESS)
+
+balance = w3.eth.get_balance(MY_ADDRESS)
+print("Balance (ETH):", w3.from_wei(balance, "ether"))
+
+
+-------
+
+
+COUNTER_ABI = [
+    {
+        "inputs": [],
+        "name": "getCount",
+        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "stateMutability": "view",
+        "type": "function",
+    },
+    {
+        "inputs": [],
+        "name": "increment",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function",
+    },
+]
+--------
+
+contract = w3.eth.contract(
+    address=Web3.to_checksum_address(CONTRACT_ADDRESS),
+    abi=COUNTER_ABI
+)
+
+count_before = contract.functions.getCount().call()
+print("Count before:", count_before)
+
+---------
+
+nonce = w3.eth.get_transaction_count(MY_ADDRESS)
+
+tx = contract.functions.increment().build_transaction({
+    "from": MY_ADDRESS,
+    "nonce": nonce,
+    "chainId": 11155111,  # Sepolia
+})
+
+# EIP-1559 fees (reasonable defaults for Sepolia)
+tx["maxFeePerGas"] = w3.to_wei(30, "gwei")
+tx["maxPriorityFeePerGas"] = w3.to_wei(2, "gwei")
+
+# Estimate gas
+tx["gas"] = w3.eth.estimate_gas(tx)
+
+# Sign + send
+signed = w3.eth.account.sign_transaction(tx, PRIVATE_KEY)
+tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
+
+print("Sent tx:", tx_hash.hex())
+
+receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+print("Mined in block:", receipt.blockNumber)
+print("Status:", receipt.status)  # 1 = success
+
+
+----------
+
+
+count_after = contract.functions.getCount().call()
+print("Count after:", count_after)
+print("Changed by:", count_after - count_before)
+
+
+
