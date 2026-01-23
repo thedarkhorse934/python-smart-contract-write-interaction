@@ -83,3 +83,10 @@ python-smart-contract-write-interaction/
 ├── requirements.txt                  # Python dependencies
 ├── LICENSE                            # MIT License
 └── README.md
+
+🔐 Security Notes
+
+- Private keys and RPC credentials are intentionally excluded
+- A Sepolia-only burner wallet was used
+- No real ETH or mainnet assets are involved
+- Secrets should be provided locally or via environment variables when running the notebook
