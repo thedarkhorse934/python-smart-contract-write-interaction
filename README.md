@@ -107,11 +107,13 @@ python-smart-contract-write-interaction/
 ---
 📌 Example Outcome
 
+```
 Connected: True
 Count before: 0
 Transaction sent and mined
 Count after: 1
 Changed by: 1
+```
 
 ---
 
@@ -125,6 +127,8 @@ Changed by: 1
 - Off-chain system design for blockchain applications
 - Secure handling of private keys in development environments
 
+---
+
 🛠️ Possible Extensions
 
 - Add additional state-changing functions
@@ -132,6 +136,8 @@ Changed by: 1
 - Track emitted events
 - Build a small analytics or monitoring layer
 - Integrate AI-based explanation of contract activity
+
+---
 
 📜 License
 
